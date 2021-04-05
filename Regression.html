@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>REGRESSION ANALYSIS</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Austin Hart" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/rladies.css" rel="stylesheet" />
+    <link href="libs/remark-css/rladies-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# REGRESSION ANALYSIS
+## OLS and the power of control
+### Austin Hart
+### American University
+
+---
+
+
+
+
+
+
+
+# Topics covered
+
+- Logic of linear regression  
+
+- Understanding slope coefficients
+
+- Multiple regression analysis
+
+- Creating regression tables
+  
+- Mutz (2010). "The dog that didn't bark" 
+
+
+---
+# Linear regression
+
+- Assessing the relationship between:
+  - continuous outcome variable (DV/Y)
+  - continuous exposure variable (IV/X)
+
+- Estimate `\(Y = a + b_1X + b_2Z\)`
+
+- Present key findings
+  - `\(b_1\)` - Change in Y for unit-increase in X, net of `\(Z\)`
+  - `\(Pr(b | \beta=0)\)`
+  
+  
+---
+class: inverse, middle, right
+
+# LINEAR RELATIONSHIPS
+### and basics of a line
+
+
+---
+# The trends we see
+
+### Looking for linear association
+
+&lt;img src="Regression_files/figure-html/corr-1.svg" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+# Correlation
+
+The correlation coefficient, `\(r\)`, indexes the direction, `\(+/-\)`, and magnitude of a linear association. 
+
+The more line-like the trend, the stronger the correlation.
+
+But cannot differentiate weak from strong responses.
+
+
+---
+# Simple linear equations
+
+Define `\(Y\)` as a linear function of `\(X\)`
+$$
+Y = a + b_1 X
+$$
+
+Coefficients
+- Intercept, `\(a = E(Y|X=0)\)`
+  
+- Slope, `\(b_1 = E(\Delta Y | \Delta X)\)`
+
+
+
+---
+class: inverse, middle, right
+
+# OLS ESTIMATION
+### the line of best fit
+
+
+---
+# Population Regression Function
+
+Model `\(Y\)` as a linear function of `\(X\)`
+$$
+Y_i = \alpha + \beta_1 X_i + e_i
+$$
+
+Parameters of the line
+- `\(\alpha\)` Intercept = `\(E(Y|X=0)\)`
+
+- `\(\beta_1\)` Slope = `\(E(\Delta Y | \Delta X)\)`
+
+The error term `\(e_i\)`
+- vertical distance between point and line `\(Y_i - (\alpha + \beta_1 X_i)\)`
+
+- reflects probabilistic nature of estimation
+
+
+---
+# Sample Regression Function
+
+Estimating the PRF with sample data:
+$$
+Y_i = a + b_1 X_i + e_i
+$$
+
+Parameters of the line
+- `\(a\)` 
+  Intercept = `\(E(Y|X=0)\)`
+- `\(b_1\)` 
+  Slope = `\(E(\Delta Y | \Delta X)\)`
+
+The error term `\(e_i\)`
+- vertical distance between point and line `\(Y_i - (a + b_1 X_i)\)`
+- reflects probabilistic nature of estimation
+
+
+---
+# Line of BEST fit
+
+&gt; OLS REGRESSION: method of estimating linear regression model. 
+&gt;
+&gt; Chooses parameters that minimize the "sum of squared errors".
+
+
+
+---
+# Interpreting estimates
+
+Given estimates from the sample data:
+$$
+Y_i = a + b_1X
+$$
+
+Slope coefficient `\(b_1\)`: Expected change in `\(Y\)` given a unit-increase in `\(X\)`.
+
+Intercept `\(a\)`: Expected value of `\(Y\)` when `\(X\)` equals zero.
+
+
+---
+# Example: DCPS testing
+
+From DCPS testing data:
+$$
+ProfLang_i = 4.3 + 0.94*ProfMath_i
+$$
+
+  A one-point increase in math proficiency is associated with a 0.94-point increase in language proficiency.
+  
+
+&lt;img src="Regression_files/figure-html/fit1-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+class: inverse, middle, right
+
+# HYPOTHESIS TESTING
+### Is this a fluke?
+
+
+---
+# Sample to Population
+
+SRF: `\(a + b_1 X_i\)`
+
+- estimate of PRF, `\(\alpha + \beta_1 X_i\)`
+
+- `\(b_1\)` unbiased estimator of `\(\beta_1\)`
+
+- Uncertainty remains about `\(\beta_1\)`
+
+
+---
+# Hypothesis testing
+
+- Set hypotheses
+  - `\(H_A: ~ \beta \neq 0\)`
+  - `\(H_0: ~ \beta = 0\)`  
+  
+- Calculate p-value
+  - Find `\(Pr(b | \beta=0)\)`
+  - If `\(p \leq 0.05\)`, reject null
+
+
+---
+class: inverse, middle, right
+
+# REGRESSION IN R
+
+
+---
+# Commands
+
+
+```r
+# Estimate
+  e1 = lm(ProfLang ~ ProfMath, data = dcps)
+
+# Visualize
+  scatter(ProfLang ~ ProfMath, data = dcps)
+  abline(e1)
+
+# Table of results
+  stargazer(e1, type = 'text')
+```
+
+
+---
+# Output
+
+.pull-left[
+&lt;img src="Regression_files/figure-html/reg2-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+
+&lt;table style="text-align:center"&gt;&lt;caption&gt;&lt;strong&gt;Regression estimates&lt;/strong&gt;&lt;/caption&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Language&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Math&lt;/td&gt;&lt;td&gt;0.943&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.042)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;4.317&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1.506)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;N&lt;/td&gt;&lt;td&gt;108&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="2" style="text-align:left"&gt;&lt;sup&gt;*&lt;/sup&gt;p &lt; .1; &lt;sup&gt;**&lt;/sup&gt;p &lt; .05; &lt;sup&gt;***&lt;/sup&gt;p &lt; .01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+]
+
+---
+class: inverse, middle, right
+
+# MULTIPLE REGRESSION
+### Reducing bias
+
+---
+# Counding bias revisited
+
+- A confound, Z, is a common cause of X and Y.
+
+- Uncontrolled confounds bias estimated effects, eg `\(b_1\)`.
+
+- Biased estimates are... biased
+
+
+---
+# OLS and conditional effects
+
+Worried about Z? Add it to the model!
+
+$$
+Y_i = a + b_1 X_i + b_2 Z_i + e_i
+$$
+
+Conditional slope coefficient, `\(b_1\)`
+- Avg change in Y for unit-increase in X
+- Independent of Z
+
+
+---
+# Implementation in R
+
+
+```r
+# Conditional estimates
+  e2 = lm(ProfLang ~ ProfMath + NumTested, data = dcps)
+
+# Add to table
+  stargazer(e1,e2, type = 'text')
+```
+
+
+---
+# Output tables
+
+
+&lt;table style="text-align:center"&gt;&lt;caption&gt;&lt;strong&gt;Conditional estimates&lt;/strong&gt;&lt;/caption&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;Language&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Math&lt;/td&gt;&lt;td&gt;0.943&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.920&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.042)&lt;/td&gt;&lt;td&gt;(0.042)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;NumTested&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.018&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.007)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;4.317&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;1.740&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1.506)&lt;/td&gt;&lt;td&gt;(1.744)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;N&lt;/td&gt;&lt;td&gt;108&lt;/td&gt;&lt;td&gt;108&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3" style="text-align:left"&gt;&lt;sup&gt;*&lt;/sup&gt;p &lt; .1; &lt;sup&gt;**&lt;/sup&gt;p &lt; .05; &lt;sup&gt;***&lt;/sup&gt;p &lt; .01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+
+
+---
+class: inverse, middle, right
+
+# EX: BO OBAMA
+### Mutz (2014) replication
+
+
+---
+# Replication analysis
+
+&gt; Estimate effect of dog ownership on Obama thermometer rating advantage. Present the unconditional estiamte as well as one conditional on political ideology, age, and income.
+&gt;
+&gt; Use the 2008 Annenberg National Election Study data (`obamasdog.dta`) to complete the analysis.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

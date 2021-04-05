@@ -1,0 +1,333 @@
+---
+title: "REGRESSION ANALYSIS"
+subtitle: "OLS and the power of control"
+author: "Austin Hart"
+institute: "American University"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, rladies, rladies-fonts]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  message=FALSE, warning=FALSE, eval = TRUE, echo = FALSE, 
+  fig.align = 'center', dev='svg'
+)
+```
+
+```{r results='hide'}
+library(tidyverse)
+library(magrittr)
+library(kableExtra)
+library(stargazer)
+
+setwd("~/Regression")
+df = haven::read_dta("obamasdog.dta")
+load("DCPS testing.RData")
+```
+
+# Topics covered
+
+- Logic of linear regression  
+
+- Understanding slope coefficients
+
+- Multiple regression analysis
+
+- Creating regression tables
+  
+- Mutz (2010). "The dog that didn't bark" 
+
+
+---
+# Linear regression
+
+- Assessing the relationship between:
+  - continuous outcome variable (DV/Y)
+  - continuous exposure variable (IV/X)
+
+- Estimate $Y = a + b_1X + b_2Z$
+
+- Present key findings
+  - $b_1$ - Change in Y for unit-increase in X, net of $Z$
+  - $Pr(b | \beta=0)$
+  
+  
+---
+class: inverse, middle, right
+
+# LINEAR RELATIONSHIPS
+### and basics of a line
+
+
+---
+# The trends we see
+
+### Looking for linear association
+
+```{r corr, fig.width=4, fig.height=4, dpi=250}
+  # 2. plot  
+    plot(ProfLang ~ ProfMath, data = dcps) # scatter
+
+```
+
+
+
+---
+# Correlation
+
+The correlation coefficient, $r$, indexes the direction, $+/-$, and magnitude of a linear association. 
+
+The more line-like the trend, the stronger the correlation.
+
+But cannot differentiate weak from strong responses.
+
+
+---
+# Simple linear equations
+
+Define $Y$ as a linear function of $X$
+$$
+Y = a + b_1 X
+$$
+
+Coefficients
+- Intercept, $a = E(Y|X=0)$
+  
+- Slope, $b_1 = E(\Delta Y | \Delta X)$
+
+
+
+---
+class: inverse, middle, right
+
+# OLS ESTIMATION
+### the line of best fit
+
+
+---
+# Population Regression Function
+
+Model $Y$ as a linear function of $X$
+$$
+Y_i = \alpha + \beta_1 X_i + e_i
+$$
+
+Parameters of the line
+- $\alpha$ Intercept = $E(Y|X=0)$
+
+- $\beta_1$ Slope = $E(\Delta Y | \Delta X)$
+
+The error term $e_i$
+- vertical distance between point and line $Y_i - (\alpha + \beta_1 X_i)$
+
+- reflects probabilistic nature of estimation
+
+
+---
+# Sample Regression Function
+
+Estimating the PRF with sample data:
+$$
+Y_i = a + b_1 X_i + e_i
+$$
+
+Parameters of the line
+- $a$ 
+  Intercept = $E(Y|X=0)$
+- $b_1$ 
+  Slope = $E(\Delta Y | \Delta X)$
+
+The error term $e_i$
+- vertical distance between point and line $Y_i - (a + b_1 X_i)$
+- reflects probabilistic nature of estimation
+
+
+---
+# Line of BEST fit
+
+> OLS REGRESSION: method of estimating linear regression model. 
+>
+> Chooses parameters that minimize the "sum of squared errors".
+
+
+
+---
+# Interpreting estimates
+
+Given estimates from the sample data:
+$$
+Y_i = a + b_1X
+$$
+
+Slope coefficient $b_1$: Expected change in $Y$ given a unit-increase in $X$.
+
+Intercept $a$: Expected value of $Y$ when $X$ equals zero.
+
+
+---
+# Example: DCPS testing
+
+From DCPS testing data:
+$$
+ProfLang_i = 4.3 + 0.94*ProfMath_i
+$$
+
+  A one-point increase in math proficiency is associated with a 0.94-point increase in language proficiency.
+  
+
+```{r fit1, fig.width=4, fig.height=4, dpi=250}
+# Scatter w/OLS fit (numeric X, numeric Y)
+  # 1. store OLS estimates
+    est = lm(ProfLang ~ ProfMath, data = dcps)
+  # 2. plot  
+    plot(ProfLang ~ ProfMath, data = dcps) # scatter
+    abline(est) # add linear fit
+```
+]
+
+
+---
+class: inverse, middle, right
+
+# HYPOTHESIS TESTING
+### Is this a fluke?
+
+
+---
+# Sample to Population
+
+SRF: $a + b_1 X_i$
+
+- estimate of PRF, $\alpha + \beta_1 X_i$
+
+- $b_1$ unbiased estimator of $\beta_1$
+
+- Uncertainty remains about $\beta_1$
+
+
+---
+# Hypothesis testing
+
+- Set hypotheses
+  - $H_A: ~ \beta \neq 0$
+  - $H_0: ~ \beta = 0$  
+  
+- Calculate p-value
+  - Find $Pr(b | \beta=0)$
+  - If $p \leq 0.05$, reject null
+
+
+---
+class: inverse, middle, right
+
+# REGRESSION IN R
+
+
+---
+# Commands
+
+```{r reg1, echo = TRUE, eval = FALSE}
+# Estimate
+  e1 = lm(ProfLang ~ ProfMath, data = dcps)
+
+# Visualize
+  scatter(ProfLang ~ ProfMath, data = dcps)
+  abline(e1)
+
+# Table of results
+  stargazer(e1, type = 'text')
+```
+
+
+---
+# Output
+
+.pull-left[
+```{r reg2, fig.width=3, fig.height=3, dpi=200}
+e1 = lm(ProfLang ~ ProfMath, data = dcps)
+# Visualize
+  plot(ProfLang ~ ProfMath, data = dcps, xlab = "Math", ylab = "Language", main = "Scatter of proficiency")
+  abline(e1)
+```
+]
+
+.pull-right[
+```{r reg3,results ='asis'}
+# Table of results
+  stargazer(e1, type = 'html', style = 'apsr', title = "Regression estimates", keep.stat = "n")
+```
+]
+
+---
+class: inverse, middle, right
+
+# MULTIPLE REGRESSION
+### Reducing bias
+
+---
+# Counding bias revisited
+
+- A confound, Z, is a common cause of X and Y.
+
+- Uncontrolled confounds bias estimated effects, eg $b_1$.
+
+- Biased estimates are... biased
+
+
+---
+# OLS and conditional effects
+
+Worried about Z? Add it to the model!
+
+$$
+Y_i = a + b_1 X_i + b_2 Z_i + e_i
+$$
+
+Conditional slope coefficient, $b_1$
+- Avg change in Y for unit-increase in X
+- Independent of Z
+
+
+---
+# Implementation in R
+
+```{r mreg1,echo=TRUE,eval=FALSE}
+# Conditional estimates
+  e2 = lm(ProfLang ~ ProfMath + NumTested, data = dcps)
+
+# Add to table
+  stargazer(e1,e2, type = 'text')
+```
+
+
+---
+# Output tables
+
+```{r mreg2,results ='asis'}
+e2 = lm(ProfLang ~ ProfMath + NumTested, data = dcps)
+stargazer(e1,e2, type = 'html', style = 'apsr', keep.stat = 'n', title = "Conditional estimates")
+```
+
+
+
+---
+class: inverse, middle, right
+
+# EX: BO OBAMA
+### Mutz (2014) replication
+
+
+---
+# Replication analysis
+
+> Estimate effect of dog ownership on Obama thermometer rating advantage. Present the unconditional estiamte as well as one conditional on political ideology, age, and income.
+>
+> Use the 2008 Annenberg National Election Study data (`obamasdog.dta`) to complete the analysis.
