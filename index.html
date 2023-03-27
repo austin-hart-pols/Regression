@@ -13,12 +13,21 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # REGRESSION ANALYSIS
-## OLS and the power of control
+]
+.subtitle[
+## OLS and confounding bias
+]
+.author[
 ### Austin Hart
+]
+.institute[
 ### American University
+]
 
 ---
+
 
 
 
@@ -28,124 +37,79 @@ class: center, middle, inverse, title-slide
 
 # Topics covered
 
-- Logic of linear regression  
+- Reviewing linear regression
 
-- Understanding slope coefficients
+- Regression and confounding bias
 
-- Multiple regression analysis
+- Multiple regression to the rescue
 
-- Creating regression tables
-  
-- Mutz (2010). "The dog that didn't bark" 
+- EC quiz
 
 
----
-# Linear regression
-
-- Assessing the relationship between:
-  - continuous outcome variable (DV/Y)
-  - continuous exposure variable (IV/X)
-
-- Estimate `\(Y = a + b_1X + b_2Z\)`
-
-- Present key findings
-  - `\(b_1\)` - Change in Y for unit-increase in X, net of `\(Z\)`
-  - `\(Pr(b | \beta=0)\)`
-  
-  
 ---
 class: inverse, middle, right
 
 # LINEAR RELATIONSHIPS
 ### and basics of a line
 
-
 ---
-# The trends we see
+# Linear regression overview
 
-### Looking for linear association
+- Assessing the relationship between:
+  - continuous outcome variable (Y)
+  - continuous exposure variable (X)
 
-&lt;img src="Regression_files/figure-html/corr-1.svg" style="display: block; margin: auto;" /&gt;
+- OLS regression and line of best fit
+  - OLS line minimizes squared error
+  - Represents mean of `\(Y\)` conditional on `\(X\)`
 
-
-
----
-# Correlation
-
-The correlation coefficient, `\(r\)`, indexes the direction, `\(+/-\)`, and magnitude of a linear association. 
-
-The more line-like the trend, the stronger the correlation.
-
-But cannot differentiate weak from strong responses.
-
-
----
-# Simple linear equations
-
-Define `\(Y\)` as a linear function of `\(X\)`
-$$
-Y = a + b_1 X
-$$
-
-Coefficients
-- Intercept, `\(a = E(Y|X=0)\)`
+- Key findings (typically)
+  - Slope coefficient as expected change in `\(\bar{Y}\)` for unit-increase in `\(X\)`
+  - Statistical significance of slope
   
-- Slope, `\(b_1 = E(\Delta Y | \Delta X)\)`
-
-
+  
 
 ---
-class: inverse, middle, right
+# Visualizing the line of best fit
 
-# OLS ESTIMATION
-### the line of best fit
+&lt;img src="Regression_files/figure-html/unnamed-chunk-2-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
 # Population Regression Function
 
-Model `\(Y\)` as a linear function of `\(X\)`
+&gt; What is the impact of variable `\(X\)` on outcome `\(Y\)` in the population?
+&gt;
+&gt; Assume `\(Y\)` is a linear function of `\(X\)`
 $$
-Y_i = \alpha + \beta_1 X_i + e_i
+Y_i = \beta_0 + \beta_1 X_i + e_i
 $$
 
-Parameters of the line
-- `\(\alpha\)` Intercept = `\(E(Y|X=0)\)`
+- Parameters of the line
+  - Intercept `\(\beta_0 = E(Y|X=0)\)`
+  - Slope `\(\beta_1 = E(\Delta Y | \Delta X)\)`
 
-- `\(\beta_1\)` Slope = `\(E(\Delta Y | \Delta X)\)`
-
-The error term `\(e_i\)`
-- vertical distance between point and line `\(Y_i - (\alpha + \beta_1 X_i)\)`
-
-- reflects probabilistic nature of estimation
+- The error term `\(e_i\)`
+  - vertical distance between point and line `\(Y_i - (\beta_0 + \beta_1 X_i)\)`
+  - reflects probabilistic nature of estimation
 
 
 ---
 # Sample Regression Function
 
-Estimating the PRF with sample data:
-$$
-Y_i = a + b_1 X_i + e_i
-$$
-
-Parameters of the line
-- `\(a\)` 
-  Intercept = `\(E(Y|X=0)\)`
-- `\(b_1\)` 
-  Slope = `\(E(\Delta Y | \Delta X)\)`
-
-The error term `\(e_i\)`
-- vertical distance between point and line `\(Y_i - (a + b_1 X_i)\)`
-- reflects probabilistic nature of estimation
-
-
----
-# Line of BEST fit
-
-&gt; OLS REGRESSION: method of estimating linear regression model. 
+&gt; Given the observed data in the sample, estimate the PRF as follows: 
 &gt;
-&gt; Chooses parameters that minimize the "sum of squared errors".
+$$
+Y_i = b_0 + b_1 X_i + e_i
+$$
 
+- Parameters of the line
+  - Intercept `\(b_0 = E(Y|X=0)\)`
+  - Slope `\(b_1 = E(\Delta Y | \Delta X)\)`
+
+- The error term `\(e_i\)`
+  - vertical distance between point and line `\(Y_i - (b_0 + b_1 X_i)\)`
+  - reflects probabilistic nature of estimation
 
 
 ---
@@ -153,58 +117,29 @@ The error term `\(e_i\)`
 
 Given estimates from the sample data:
 $$
-Y_i = a + b_1X
+Y_i = b_0 + b_1X
 $$
 
-Slope coefficient `\(b_1\)`: Expected change in `\(Y\)` given a unit-increase in `\(X\)`.
+- Slope coefficient `\(b_1\)` represents expected change in the mean of `\(Y\)` for every one-unit increase in `\(X\)`.
 
-Intercept `\(a\)`: Expected value of `\(Y\)` when `\(X\)` equals zero.
-
-
----
-# Example: DCPS testing
-
-From DCPS testing data:
-$$
-ProfLang_i = 4.3 + 0.94*ProfMath_i
-$$
-
-  A one-point increase in math proficiency is associated with a 0.94-point increase in language proficiency.
-  
-
-&lt;img src="Regression_files/figure-html/fit1-1.svg" style="display: block; margin: auto;" /&gt;
-]
-
-
----
-class: inverse, middle, right
-
-# HYPOTHESIS TESTING
-### Is this a fluke?
-
-
----
-# Sample to Population
-
-SRF: `\(a + b_1 X_i\)`
-
-- estimate of PRF, `\(\alpha + \beta_1 X_i\)`
-
-- `\(b_1\)` unbiased estimator of `\(\beta_1\)`
-
-- Uncertainty remains about `\(\beta_1\)`
-
+- Intercept `\(a\)` is the mean of `\(Y\)` when `\(X\)` equals zero.
 
 ---
 # Hypothesis testing
+### Sample to population
+
+- SRF: `\(b_0 + b_1 X_i\)`
+  - estimate of PRF, `\(\alpha + \beta_1 X_i\)`
+  - `\(b_1\)` unbiased estimator of `\(\beta_1\)`
+  - Uncertainty remains about `\(\beta_1\)`
 
 - Set hypotheses
-  - `\(H_A: ~ \beta \neq 0\)`
-  - `\(H_0: ~ \beta = 0\)`  
+  - `\(H_A: ~ \beta_1 \neq 0\)`
+  - `\(H_0: ~ \beta_1 = 0\)`  
   
-- Calculate p-value
-  - Find `\(Pr(b | \beta=0)\)`
-  - If `\(p \leq 0.05\)`, reject null
+- Calculate `\(t\)`
+  - `\(t=\frac{b_1}{se(b_1)}\)`
+  - For 5% significance, reject `\(H_0\)` if `\(t&gt;1.96\)`
 
 
 ---
@@ -223,10 +158,10 @@ class: inverse, middle, right
 
 # Visualize
   scatter(ProfLang ~ ProfMath, data = dcps)
-  abline(e1)
+    abline(e1)
 
 # Table of results
-  stargazer(e1, type = 'text')
+  stargazer(e1, type = 'text', keep.stat = 'n')
 ```
 
 
@@ -234,14 +169,14 @@ class: inverse, middle, right
 # Output
 
 .pull-left[
-&lt;img src="Regression_files/figure-html/reg2-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="Regression_files/figure-html/unnamed-chunk-3-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 .pull-right[
 
-&lt;table style="text-align:center"&gt;&lt;caption&gt;&lt;strong&gt;Regression estimates&lt;/strong&gt;&lt;/caption&gt;
-&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Language&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Math&lt;/td&gt;&lt;td&gt;0.943&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;table style="text-align:center"&gt;&lt;caption&gt;&lt;strong&gt;OLS estimates&lt;/strong&gt;&lt;/caption&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;ProfLang&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;ProfMath&lt;/td&gt;&lt;td&gt;0.943&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.042)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;4.317&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1.506)&lt;/td&gt;&lt;/tr&gt;
@@ -251,87 +186,196 @@ class: inverse, middle, right
 ]
 
 ---
+# Interpretation
+
+
+.pull-left[
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;ProfLang&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;ProfMath&lt;/td&gt;&lt;td&gt;0.94&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.04)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;4.32&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1.51)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;108&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+]
+
+.pull-right[
+
+  Across DC public schools, a one-point increase in student math proficiency is associated with a 0.94-point increase in average language proficiency.  
+  The relationship is significant at the 5% level.
+  
+]
+
+---
 class: inverse, middle, right
 
 # MULTIPLE REGRESSION
 ### Reducing bias
 
 ---
-# Counding bias revisited
+# Counding bias
 
-- A confound, Z, is a common cause of X and Y.
+&gt; Estimate = Truth + Error + Bias
 
-- Uncontrolled confounds bias estimated effects, eg `\(b_1\)`.
+- A confounder, `\(Z\)`, is a common cause of `\(X\)` and `\(Y\)`
 
-- Biased estimates are... biased
+- Confounders induce bias
+
+- Mitigate bias with:
+  - Control (e.g., experimental control)
+  - Conditioning (e.g., multiple regression)
+
+
+
+---
+# Unconditional OLS
+
+.pull-left[
+- Unconditional model assumes:
+$$
+Y_i = \beta_0 + \beta_1 X_i + e_i
+$$
+
+- Gives 0 weight to any third var, Z
+
+]
+
+.pull-right[
+
+&lt;img src="Regression_files/figure-html/unnamed-chunk-6-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+# Confounding bias in OLS
+
+
+.pull-left[
+- If the true PRF is:
+
+$$
+Y_i = \beta_0 + \beta_1 X_i + \beta_2 Z_i + e_i
+$$
+
+- And you estimate:
+
+$$
+Y_i = \beta_0 + \beta_1 + e_i
+$$
+
+- Then `\(\beta_1^* \neq \beta_1\)` if X and Z are correlated
+
+- Specifically, `\(\beta_1^*\)` includes the association b/w X and Y *AND* some of the association between Z and Y.
+
+]
+
+.pull-right[
+
+&lt;img src="Regression_files/figure-html/unnamed-chunk-7-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
+
+]
+
 
 
 ---
 # OLS and conditional effects
 
-Worried about Z? Add it to the model!
+Worried that Z is a confounder? Add it to the model!
 
 $$
-Y_i = a + b_1 X_i + b_2 Z_i + e_i
+Y_i = b_0 + b_1 X_i + b_2 Z_i + e_i
 $$
 
 Conditional slope coefficient, `\(b_1\)`
-- Avg change in Y for unit-increase in X
-- Independent of Z
+- Change in mean `\(Y\)` for unit-increase in `\(X\)`
+- ...independent of Z
 
 
 ---
 # Implementation in R
 
+.pull-left[
+
 
 ```r
 # Conditional estimates
-  e2 = lm(ProfLang ~ ProfMath + NumTested, data = dcps)
+  e2 = lm(ProfLang ~ProfMath + NumTested, data=dcps)
 
 # Add to table
-  stargazer(e1,e2, type = 'text')
+  stargazer(e1,e2, type = 'text', keep.stat = 'n')
 ```
+]
 
-
----
-# Output tables
+.pull-right[
 
 
 &lt;table style="text-align:center"&gt;&lt;caption&gt;&lt;strong&gt;Conditional estimates&lt;/strong&gt;&lt;/caption&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;Language&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;ProfLang&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Math&lt;/td&gt;&lt;td&gt;0.943&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.920&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.042)&lt;/td&gt;&lt;td&gt;(0.042)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;NumTested&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.018&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.007)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;4.317&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;1.740&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1.506)&lt;/td&gt;&lt;td&gt;(1.744)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;ProfMath&lt;/td&gt;&lt;td&gt;0.94&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.92&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.04)&lt;/td&gt;&lt;td&gt;(0.04)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;NumTested&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.02&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.01)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;4.32&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;1.74&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1.51)&lt;/td&gt;&lt;td&gt;(1.74)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;N&lt;/td&gt;&lt;td&gt;108&lt;/td&gt;&lt;td&gt;108&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3" style="text-align:left"&gt;&lt;sup&gt;*&lt;/sup&gt;p &lt; .1; &lt;sup&gt;**&lt;/sup&gt;p &lt; .05; &lt;sup&gt;***&lt;/sup&gt;p &lt; .01&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 
-
+]
 
 ---
 class: inverse, middle, right
 
-# EX: BO OBAMA
-### Mutz (2014) replication
+# EC QUIZ
+### Building on last week
+
+---
+# Where to start
+
+- Set up a new R script (be sure to load `haven`)
+
+- Open `anes2012 workshop.rdata`
+
+- Filter for white, non-Hispanic respondents
+
+- Use freq table and text to describe data on `global.warming`
+
+- Use graph, summary stats, and text to describe `party.id`
 
 
 ---
-# Replication analysis
+# EC Quiz
 
-&gt; Estimate effect of dog ownership on Obama thermometer rating advantage. Present the unconditional estiamte as well as one conditional on political ideology, age, and income.
+&gt; Evaluate relationship between attitudes about feminists (Y) and racial resentment (X) using OLS regression. Present and interpret a single table with unconditional and conditional estimates.
 &gt;
-&gt; Use the 2008 Annenberg National Election Study data (`obamasdog.dta`) to complete the analysis.
+&gt; Submit your table and interpretation in a document (.doc or .pdf) on Canvas.
+
+
+- Model 1: Unconditional relationship
+
+- Model 2: Same but conditional on 
+  - party identification 
+  - political ideology
+  - national economic evaluation
+  - age
+  
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
 "highlightStyle": "github",
 "highlightLines": true,
-"countIncrementalSlides": false
+"countIncrementalSlides": false,
+"ratio": "16:9"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
@@ -372,6 +416,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

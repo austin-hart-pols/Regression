@@ -1,6 +1,6 @@
 ---
 title: "REGRESSION ANALYSIS"
-subtitle: "OLS and the power of control"
+subtitle: "OLS and confounding bias"
 author: "Austin Hart"
 institute: "American University"
 output:
@@ -11,152 +11,111 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+      ratio: "16:9"
 ---
 
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(
-  message=FALSE, warning=FALSE, eval = TRUE, echo = FALSE, 
+  message=FALSE, warning=FALSE, eval = TRUE, 
+  echo = FALSE, 
   fig.align = 'center', dev='svg'
 )
 ```
 
+
 ```{r results='hide'}
 library(tidyverse)
-library(magrittr)
 library(kableExtra)
 library(stargazer)
 
-setwd("~/Regression")
-df = haven::read_dta("obamasdog.dta")
+#load("anes2012 workshop.rdata")
 load("DCPS testing.RData")
 ```
 
 # Topics covered
 
-- Logic of linear regression  
+- Reviewing linear regression
 
-- Understanding slope coefficients
+- Regression and confounding bias
 
-- Multiple regression analysis
+- Multiple regression to the rescue
 
-- Creating regression tables
-  
-- Mutz (2010). "The dog that didn't bark" 
+- EC quiz
 
 
----
-# Linear regression
-
-- Assessing the relationship between:
-  - continuous outcome variable (DV/Y)
-  - continuous exposure variable (IV/X)
-
-- Estimate $Y = a + b_1X + b_2Z$
-
-- Present key findings
-  - $b_1$ - Change in Y for unit-increase in X, net of $Z$
-  - $Pr(b | \beta=0)$
-  
-  
 ---
 class: inverse, middle, right
 
 # LINEAR RELATIONSHIPS
 ### and basics of a line
 
-
 ---
-# The trends we see
+# Linear regression overview
 
-### Looking for linear association
+- Assessing the relationship between:
+  - continuous outcome variable (Y)
+  - continuous exposure variable (X)
 
-```{r corr, fig.width=4, fig.height=4, dpi=250}
-  # 2. plot  
-    plot(ProfLang ~ ProfMath, data = dcps) # scatter
+- OLS regression and line of best fit
+  - OLS line minimizes squared error
+  - Represents mean of $Y$ conditional on $X$
 
-```
-
-
-
----
-# Correlation
-
-The correlation coefficient, $r$, indexes the direction, $+/-$, and magnitude of a linear association. 
-
-The more line-like the trend, the stronger the correlation.
-
-But cannot differentiate weak from strong responses.
-
-
----
-# Simple linear equations
-
-Define $Y$ as a linear function of $X$
-$$
-Y = a + b_1 X
-$$
-
-Coefficients
-- Intercept, $a = E(Y|X=0)$
+- Key findings (typically)
+  - Slope coefficient as expected change in $\bar{Y}$ for unit-increase in $X$
+  - Statistical significance of slope
   
-- Slope, $b_1 = E(\Delta Y | \Delta X)$
-
-
+  
 
 ---
-class: inverse, middle, right
+# Visualizing the line of best fit
 
-# OLS ESTIMATION
-### the line of best fit
+```{r, fig.width=5, fig.height=4, dpi=250}
+# Scatter w/OLS fit (numeric X, numeric Y)
+  # Store OLS estimates
+    est = lm(ProfLang ~ ProfMath, data = dcps)
+  # Plot  
+    plot(ProfLang ~ ProfMath, data = dcps) # scatter
+      abline(est) # add linear fit
+```
 
 
 ---
 # Population Regression Function
 
-Model $Y$ as a linear function of $X$
+> What is the impact of variable $X$ on outcome $Y$ in the population?
+>
+> Assume $Y$ is a linear function of $X$
 $$
-Y_i = \alpha + \beta_1 X_i + e_i
+Y_i = \beta_0 + \beta_1 X_i + e_i
 $$
 
-Parameters of the line
-- $\alpha$ Intercept = $E(Y|X=0)$
+- Parameters of the line
+  - Intercept $\beta_0 = E(Y|X=0)$
+  - Slope $\beta_1 = E(\Delta Y | \Delta X)$
 
-- $\beta_1$ Slope = $E(\Delta Y | \Delta X)$
-
-The error term $e_i$
-- vertical distance between point and line $Y_i - (\alpha + \beta_1 X_i)$
-
-- reflects probabilistic nature of estimation
+- The error term $e_i$
+  - vertical distance between point and line $Y_i - (\beta_0 + \beta_1 X_i)$
+  - reflects probabilistic nature of estimation
 
 
 ---
 # Sample Regression Function
 
-Estimating the PRF with sample data:
-$$
-Y_i = a + b_1 X_i + e_i
-$$
-
-Parameters of the line
-- $a$ 
-  Intercept = $E(Y|X=0)$
-- $b_1$ 
-  Slope = $E(\Delta Y | \Delta X)$
-
-The error term $e_i$
-- vertical distance between point and line $Y_i - (a + b_1 X_i)$
-- reflects probabilistic nature of estimation
-
-
----
-# Line of BEST fit
-
-> OLS REGRESSION: method of estimating linear regression model. 
+> Given the observed data in the sample, estimate the PRF as follows: 
 >
-> Chooses parameters that minimize the "sum of squared errors".
+$$
+Y_i = b_0 + b_1 X_i + e_i
+$$
 
+- Parameters of the line
+  - Intercept $b_0 = E(Y|X=0)$
+  - Slope $b_1 = E(\Delta Y | \Delta X)$
+
+- The error term $e_i$
+  - vertical distance between point and line $Y_i - (b_0 + b_1 X_i)$
+  - reflects probabilistic nature of estimation
 
 
 ---
@@ -164,65 +123,29 @@ The error term $e_i$
 
 Given estimates from the sample data:
 $$
-Y_i = a + b_1X
+Y_i = b_0 + b_1X
 $$
 
-Slope coefficient $b_1$: Expected change in $Y$ given a unit-increase in $X$.
+- Slope coefficient $b_1$ represents expected change in the mean of $Y$ for every one-unit increase in $X$.
 
-Intercept $a$: Expected value of $Y$ when $X$ equals zero.
-
-
----
-# Example: DCPS testing
-
-From DCPS testing data:
-$$
-ProfLang_i = 4.3 + 0.94*ProfMath_i
-$$
-
-  A one-point increase in math proficiency is associated with a 0.94-point increase in language proficiency.
-  
-
-```{r fit1, fig.width=4, fig.height=4, dpi=250}
-# Scatter w/OLS fit (numeric X, numeric Y)
-  # 1. store OLS estimates
-    est = lm(ProfLang ~ ProfMath, data = dcps)
-  # 2. plot  
-    plot(ProfLang ~ ProfMath, data = dcps) # scatter
-    abline(est) # add linear fit
-```
-]
-
-
----
-class: inverse, middle, right
-
-# HYPOTHESIS TESTING
-### Is this a fluke?
-
-
----
-# Sample to Population
-
-SRF: $a + b_1 X_i$
-
-- estimate of PRF, $\alpha + \beta_1 X_i$
-
-- $b_1$ unbiased estimator of $\beta_1$
-
-- Uncertainty remains about $\beta_1$
-
+- Intercept $a$ is the mean of $Y$ when $X$ equals zero.
 
 ---
 # Hypothesis testing
+### Sample to population
+
+- SRF: $b_0 + b_1 X_i$
+  - estimate of PRF, $\alpha + \beta_1 X_i$
+  - $b_1$ unbiased estimator of $\beta_1$
+  - Uncertainty remains about $\beta_1$
 
 - Set hypotheses
-  - $H_A: ~ \beta \neq 0$
-  - $H_0: ~ \beta = 0$  
+  - $H_A: ~ \beta_1 \neq 0$
+  - $H_0: ~ \beta_1 = 0$  
   
-- Calculate p-value
-  - Find $Pr(b | \beta=0)$
-  - If $p \leq 0.05$, reject null
+- Calculate $t$
+  - $t=\frac{b_1}{se(b_1)}$
+  - For 5% significance, reject $H_0$ if $t>1.96$
 
 
 ---
@@ -240,10 +163,10 @@ class: inverse, middle, right
 
 # Visualize
   scatter(ProfLang ~ ProfMath, data = dcps)
-  abline(e1)
+    abline(e1)
 
 # Table of results
-  stargazer(e1, type = 'text')
+  stargazer(e1, type = 'text', keep.stat = 'n')
 ```
 
 
@@ -251,19 +174,39 @@ class: inverse, middle, right
 # Output
 
 .pull-left[
-```{r reg2, fig.width=3, fig.height=3, dpi=200}
+```{r, fig.width=4, fig.height=4, dpi=200}
 e1 = lm(ProfLang ~ ProfMath, data = dcps)
 # Visualize
-  plot(ProfLang ~ ProfMath, data = dcps, xlab = "Math", ylab = "Language", main = "Scatter of proficiency")
+  plot(ProfLang ~ ProfMath, data = dcps, xlab = "Math", ylab = "Language", main = "Proficiency in DCPS")
   abline(e1)
 ```
 ]
 
 .pull-right[
-```{r reg3,results ='asis'}
+```{r, results ='asis'}
 # Table of results
-  stargazer(e1, type = 'html', style = 'apsr', title = "Regression estimates", keep.stat = "n")
+  stargazer(e1, type = 'html', style = 'apsr', title = "OLS estimates", keep.stat = "n")
 ```
+]
+
+---
+# Interpretation
+
+
+.pull-left[
+
+```{r, results='asis'}
+# stargazer table
+  stargazer::stargazer(est, type='html', digits = 2L, keep.stat='n')
+```
+
+]
+
+.pull-right[
+
+  Across DC public schools, a one-point increase in student math proficiency is associated with a 0.94-point increase in average language proficiency.  
+  The relationship is significant at the 5% level.
+  
 ]
 
 ---
@@ -273,61 +216,233 @@ class: inverse, middle, right
 ### Reducing bias
 
 ---
-# Counding bias revisited
+# Counding bias
 
-- A confound, Z, is a common cause of X and Y.
+> Estimate = Truth + Error + Bias
 
-- Uncontrolled confounds bias estimated effects, eg $b_1$.
+- A confounder, $Z$, is a common cause of $X$ and $Y$
 
-- Biased estimates are... biased
+- Confounders induce bias
+
+- Mitigate bias with:
+  - Control (e.g., experimental control)
+  - Conditioning (e.g., multiple regression)
+
+
+
+---
+# Unconditional OLS
+
+.pull-left[
+- Unconditional model assumes:
+$$
+Y_i = \beta_0 + \beta_1 X_i + e_i
+$$
+
+- Gives 0 weight to any third var, Z
+
+]
+
+.pull-right[
+
+```{r, engine='tikz', out.width='70%'}
+
+	\def\firstcircle{(90:.75cm) circle (1cm)}
+	\def\secondcircle{(210:.75cm) circle (1cm)}
+	\def\thirdcircle{(330:.75cm) circle (1cm)}	
+	
+	\def\mono{(330:1.25cm) circle (.5cm)}	
+	\def\exog{(25:1.25cm) circle (.75cm)}
+	\def\mc{(250:.1cm) circle (1cm)}
+	
+	\begin{tikzpicture}
+		\begin{scope}
+			\begin{scope}[even odd rule]
+				\clip \firstcircle;
+				\fill[blue!80!white] \firstcircle;
+			\end{scope}
+			
+			\begin{scope}[even odd rule]
+				\clip \secondcircle;
+				\fill[red!80!black] \secondcircle;
+			\end{scope}
+			
+			\begin{scope}
+				\clip \firstcircle;
+				\clip \secondcircle;
+				\fill[gray] \secondcircle;
+			\end{scope}
+      		
+			\draw \firstcircle node[text=black,above] {$Y$};
+			\draw \secondcircle node [text=black,below left] {$X$};
+			\draw \thirdcircle node [text=black,below right] {$Z$};
+    		\end{scope}
+	\end{tikzpicture}
+
+```
+
+]
+
+---
+# Confounding bias in OLS
+
+
+.pull-left[
+- If the true PRF is:
+
+$$
+Y_i = \beta_0 + \beta_1 X_i + \beta_2 Z_i + e_i
+$$
+
+- And you estimate:
+
+$$
+Y_i = \beta_0 + \beta_1 + e_i
+$$
+
+- Then $\beta_1^* \neq \beta_1$ if X and Z are correlated
+
+- Specifically, $\beta_1^*$ includes the association b/w X and Y *AND* some of the association between Z and Y.
+
+]
+
+.pull-right[
+
+```{r, engine='tikz', out.width='70%'}
+
+	\def\firstcircle{(90:.75cm) circle (1cm)}
+	\def\secondcircle{(210:.75cm) circle (1cm)}
+	\def\thirdcircle{(330:.75cm) circle (1cm)}	
+	
+	\def\mono{(330:1.25cm) circle (.5cm)}	
+	\def\exog{(25:1.25cm) circle (.75cm)}
+	\def\mc{(250:.1cm) circle (1cm)}
+	
+	
+	\begin{tikzpicture}
+		\begin{scope}
+			\begin{scope}[even odd rule]
+				\clip \thirdcircle (-2,-2) rectangle (2,2);
+				\fill[blue!80!white] \firstcircle;
+			\end{scope}
+			
+			\begin{scope}[even odd rule]
+				\clip \firstcircle (-2,-2) rectangle (2,2);
+				\fill[yellow] \thirdcircle;
+			\end{scope}
+			
+			\begin{scope}[even odd rule]
+				\clip \firstcircle (-2,-2) rectangle (2,2);
+				\clip \secondcircle;
+				\fill[red!80!black] \secondcircle;
+			\end{scope}
+			
+			\begin{scope}
+				\clip \firstcircle;
+				\clip \thirdcircle;
+				\fill[green!80!black] \thirdcircle;
+			\end{scope}
+			
+			\begin{scope}
+				\clip \secondcircle;
+				\clip \thirdcircle;
+				\fill[orange!80!black] \secondcircle;
+			\end{scope}
+			
+			\begin{scope}
+				\clip \firstcircle;
+				\clip \secondcircle;
+				\fill[magenta!80!black] \secondcircle;
+			\end{scope}
+			
+			\begin{scope}
+				\clip \firstcircle;
+				\clip \secondcircle;
+				\fill[black] \thirdcircle;
+			\end{scope}   
+			     		
+			\draw \firstcircle node[text=black,above] {$Y$};
+			\draw \secondcircle node [text=black,below left] {$X$};
+			\draw \thirdcircle node [text=black,below right] {$Z$};
+    		\end{scope}
+	\end{tikzpicture}
+
+```
+
+]
+
 
 
 ---
 # OLS and conditional effects
 
-Worried about Z? Add it to the model!
+Worried that Z is a confounder? Add it to the model!
 
 $$
-Y_i = a + b_1 X_i + b_2 Z_i + e_i
+Y_i = b_0 + b_1 X_i + b_2 Z_i + e_i
 $$
 
 Conditional slope coefficient, $b_1$
-- Avg change in Y for unit-increase in X
-- Independent of Z
+- Change in mean $Y$ for unit-increase in $X$
+- ...independent of Z
 
 
 ---
 # Implementation in R
 
+.pull-left[
+
 ```{r mreg1,echo=TRUE,eval=FALSE}
 # Conditional estimates
-  e2 = lm(ProfLang ~ ProfMath + NumTested, data = dcps)
+  e2 = lm(ProfLang ~ProfMath + NumTested, data=dcps)
 
 # Add to table
-  stargazer(e1,e2, type = 'text')
+  stargazer(e1,e2, type = 'text', keep.stat = 'n')
+```
+]
+
+.pull-right[
+
+```{r,results ='asis'}
+e2 = lm(ProfLang ~ ProfMath+NumTested, data=dcps)
+stargazer(e1,e2, type = 'html', style = 'apsr', keep.stat = 'n', digits = 2L, title = "Conditional estimates")
 ```
 
-
----
-# Output tables
-
-```{r mreg2,results ='asis'}
-e2 = lm(ProfLang ~ ProfMath + NumTested, data = dcps)
-stargazer(e1,e2, type = 'html', style = 'apsr', keep.stat = 'n', title = "Conditional estimates")
-```
-
-
+]
 
 ---
 class: inverse, middle, right
 
-# EX: BO OBAMA
-### Mutz (2014) replication
+# EC QUIZ
+### Building on last week
+
+---
+# Where to start
+
+- Set up a new R script (be sure to load `haven`)
+
+- Open `anes2012 workshop.rdata`
+
+- Filter for white, non-Hispanic respondents
+
+- Use freq table and text to describe data on `global.warming`
+
+- Use graph, summary stats, and text to describe `party.id`
 
 
 ---
-# Replication analysis
+# EC Quiz
 
-> Estimate effect of dog ownership on Obama thermometer rating advantage. Present the unconditional estiamte as well as one conditional on political ideology, age, and income.
+> Evaluate relationship between attitudes about feminists (Y) and racial resentment (X) using OLS regression. Present and interpret a single table with unconditional and conditional estimates.
 >
-> Use the 2008 Annenberg National Election Study data (`obamasdog.dta`) to complete the analysis.
+> Submit your table and interpretation in a document (.doc or .pdf) on Canvas.
+
+
+- Model 1: Unconditional relationship
+
+- Model 2: Same but conditional on 
+  - party identification 
+  - political ideology
+  - national economic evaluation
+  - age
+  
