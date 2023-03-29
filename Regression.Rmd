@@ -19,7 +19,7 @@ output:
 options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(
   message=FALSE, warning=FALSE, eval = TRUE, 
-  echo = FALSE, 
+  echo = FALSE, cache = TRUE,
   fig.align = 'center', dev='svg'
 )
 ```
@@ -97,7 +97,7 @@ $$
 
 - The error term $e_i$
   - vertical distance between point and line $Y_i - (\beta_0 + \beta_1 X_i)$
-  - reflects probabilistic nature of estimation
+  - the variation in $Y$ not explained by $X$
 
 
 ---
@@ -115,7 +115,7 @@ $$
 
 - The error term $e_i$
   - vertical distance between point and line $Y_i - (b_0 + b_1 X_i)$
-  - reflects probabilistic nature of estimation
+  - variation in $Y$ not explained by X
 
 
 ---
@@ -126,16 +126,16 @@ $$
 Y_i = b_0 + b_1X
 $$
 
-- Slope coefficient $b_1$ represents expected change in the mean of $Y$ for every one-unit increase in $X$.
+- Slope coefficient: the expected value of $Y$ increases/decreases by $b_1$ for every one-unit increase in $X$.
 
-- Intercept $a$ is the mean of $Y$ when $X$ equals zero.
+- Intercept: the mean of $Y$ when $X=0$ is $b_0$.
 
 ---
 # Hypothesis testing
 ### Sample to population
 
 - SRF: $b_0 + b_1 X_i$
-  - estimate of PRF, $\alpha + \beta_1 X_i$
+  - estimate of PRF, $\beta_0 + \beta_1 X_i$
   - $b_1$ unbiased estimator of $\beta_1$
   - Uncertainty remains about $\beta_1$
 
@@ -145,7 +145,7 @@ $$
   
 - Calculate $t$
   - $t=\frac{b_1}{se(b_1)}$
-  - For 5% significance, reject $H_0$ if $t>1.96$
+  - For 5% significance, reject $H_0$ if $t>t_{\alpha=0.05}$, typically about 1.96.
 
 
 ---
@@ -158,14 +158,14 @@ class: inverse, middle, right
 # Commands
 
 ```{r reg1, echo = TRUE, eval = FALSE}
-# Estimate
+# Estimate regression
   e1 = lm(ProfLang ~ ProfMath, data = dcps)
 
-# Visualize
+# Visualize relationship
   scatter(ProfLang ~ ProfMath, data = dcps)
     abline(e1)
 
-# Table of results
+# Generate table of results
   stargazer(e1, type = 'text', keep.stat = 'n')
 ```
 
@@ -185,7 +185,7 @@ e1 = lm(ProfLang ~ ProfMath, data = dcps)
 .pull-right[
 ```{r, results ='asis'}
 # Table of results
-  stargazer(e1, type = 'html', style = 'apsr', title = "OLS estimates", keep.stat = "n")
+  stargazer(e1, type = 'html', style = 'apsr', digits = 2L, keep.stat = "n")
 ```
 ]
 
@@ -204,7 +204,7 @@ e1 = lm(ProfLang ~ ProfMath, data = dcps)
 
 .pull-right[
 
-  Across DC public schools, a one-point increase in student math proficiency is associated with a 0.94-point increase in average language proficiency.  
+  Across DC public schools, expected language proficiency goes up by 0.94 points for every one-point increase in math proficiency.  
   The relationship is significant at the 5% level.
   
 ]
@@ -216,13 +216,13 @@ class: inverse, middle, right
 ### Reducing bias
 
 ---
-# Counding bias
+# Confunding bias
 
-> Estimate = Truth + Error + Bias
+> Estimate = Estimand + Noise + Bias
 
 - A confounder, $Z$, is a common cause of $X$ and $Y$
 
-- Confounders induce bias
+- Confounders induce bias, pulling the estimate away from the true estimand
 
 - Mitigate bias with:
   - Control (e.g., experimental control)
@@ -239,8 +239,7 @@ $$
 Y_i = \beta_0 + \beta_1 X_i + e_i
 $$
 
-- Gives 0 weight to any third var, Z
-
+- Assumes that the gray area is the *unique* correlation b/w $X$ and $Y$.
 ]
 
 .pull-right[
@@ -288,21 +287,21 @@ $$
 
 
 .pull-left[
-- If the true PRF is:
+- Assume $Y$ is a function of $X$ and $Z$:
 
 $$
 Y_i = \beta_0 + \beta_1 X_i + \beta_2 Z_i + e_i
 $$
 
-- And you estimate:
+- But you ignore $Z$ and estimate:
 
 $$
-Y_i = \beta_0 + \beta_1 + e_i
+Y_i = \beta_0 + \beta^* _1 X_i + e_i
 $$
 
-- Then $\beta_1^* \neq \beta_1$ if X and Z are correlated
-
-- Specifically, $\beta_1^*$ includes the association b/w X and Y *AND* some of the association between Z and Y.
+- Then $\beta^* _1$ includes:
+  - $\beta_1$: association b/w X and Y (magenta) 
+  - **BIAS**: association b/w X and Z and Y (black)
 
 ]
 
@@ -383,8 +382,8 @@ Y_i = b_0 + b_1 X_i + b_2 Z_i + e_i
 $$
 
 Conditional slope coefficient, $b_1$
-- Change in mean $Y$ for unit-increase in $X$
-- ...independent of Z
+- Expected value of $Y$ increases/decreases by $b_1$ for unit-increase in $X$
+- ...conditional on Z
 
 
 ---
@@ -393,18 +392,21 @@ Conditional slope coefficient, $b_1$
 .pull-left[
 
 ```{r mreg1,echo=TRUE,eval=FALSE}
-# Conditional estimates
-  e2 = lm(ProfLang ~ProfMath + NumTested, data=dcps)
+# Unconditional estimate
+  e1 = lm(ProfLang ~ ProfMath, data = dcps)
 
-# Add to table
-  stargazer(e1,e2, type = 'text', keep.stat = 'n')
+# Conditional estimate
+  e2 = lm(ProfLang ~ ProfMath + NumTested, data = dcps)
+
+# Generate table with both
+  stargazer(e1, e2, type = 'text', keep.stat = 'n')
 ```
 ]
 
 .pull-right[
 
 ```{r,results ='asis'}
-e2 = lm(ProfLang ~ ProfMath+NumTested, data=dcps)
+e2 = lm(ProfLang ~ ProfMath + NumTested, data=dcps)
 stargazer(e1,e2, type = 'html', style = 'apsr', keep.stat = 'n', digits = 2L, title = "Conditional estimates")
 ```
 
@@ -427,15 +429,15 @@ class: inverse, middle, right
 
 - Use freq table and text to describe data on `global.warming`
 
-- Use graph, summary stats, and text to describe `party.id`
+- Use graph or table and text to describe `party.id`
 
 
 ---
 # EC Quiz
 
-> Evaluate relationship between attitudes about feminists (Y) and racial resentment (X) using OLS regression. Present and interpret a single table with unconditional and conditional estimates.
+> Evaluate relationship between attitudes about feminists (Y) and racial resentment (X) using linear regression. Present and interpret a single table with unconditional and conditional estimates.
 >
-> Submit your table and interpretation in a document (.doc or .pdf) on Canvas.
+> Submit your table and interpretation in a document (.docx or .pdf) on Canvas.
 
 
 - Model 1: Unconditional relationship
