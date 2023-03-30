@@ -2,8 +2,8 @@
 Introduction to linear regression analysis. Topics include: 
 
 - OLS estimation
-- Slope and partial slope coefficients
+- Multiple regression and confounding bias
 - Hypothesis testing
 - Formatting regression tables  
 
-Examples using the 2008 NAES data (`obamasdog.dta`) and `DCPS testing.RData`.
+Examples using the 2012 ANES data (`anes2012 workshop.RData`).
