@@ -1,69 +1,50 @@
-# Mutz workshop day
-# Austin Hart
-# ----------------------
+#+ WROKSHOP: Multiple regression
+#+ March 27 2024
 
-# Setup
-  library(tidyverse)
+# SETUP ---------------------
+## load packages
+  library(tidyverse)  
   library(haven)
   library(stargazer)
 
-  df = read_dta('obamasdog.dta') %>%
-    mutate(PID3 = case_when(
-      PartyID == 3 ~ 'DEM',
-      PartyID == 1 ~ 'IND',
-      PartyID == 2 ~ 'REP'
-    ))
-  
+## set your directory
+  setwd("C:/Users/ahart/Desktop/sis600") 
 
-# Exploratory analysis
-# ---------------------- 
+## load data
+  df = read_dta('obamasdog.dta')
 
-  # Candidate ratings
+# EXPLORE -------------------
+## Feeling thermometer Adv
+  summary(df$ObamaAdv)
   hist(df$ObamaAdv)
-  summary(df$ObamaAdv)  
+  
+## Dog ownership
+  count(df, PetDog) |>
+    mutate(percent = 100 * n / sum(n))
 
-  # Pet ownership
-  count(df, PetDog)
+# REGRESSION ----------------
+## Plot
+  boxplot(ObamaAdv ~ PetDog, df)
 
-  # Party identification
-  count(df, PID3)
-  
+  b1 = df |>
+    group_by(PetDog) |>
+    summarise(avg = mean(ObamaAdv, na.rm = T))
 
-# Unconditional reg
-# ----------------------
+  barplot(avg ~ PetDog, b1, 
+          ylab = 'Avg Obama Advantage',
+          xlab = 'Owns Dog')
   
-  # plot
-  boxplot(ObamaAdv ~ PetDog, data = df)
+## Models
+  e1 = lm(ObamaAdv ~ PetDog, df)  
+  e2 = lm(ObamaAdv ~ PetDog + PetCat + PetFish + PetBird + 
+            PetRodent + PetHorse + PetReptile + PetOther +
+            PartyID + IdeologyLR + 
+            NationalEconomy + FamilyFinance, df)
+  e3 = lm(ObamaAdv ~ PetDog + PetCat + PetFish + PetBird + 
+            PetRodent + PetHorse + PetReptile + PetOther +
+            PartyID + IdeologyLR + 
+            NationalEconomy + FamilyFinance +
+            Income + Age, df)
   
-  # est regression
-  m1 = lm(ObamaAdv ~ PetDog, data = df)
-
-  # estimates to table
-  stargazer(m1, type = 'text', keep.stat = 'n')
-    
-  
-# PID as confounder
-# ----------------------
-  
-  # PID and candidate eval
-  group_by(df, PID3) %>%
-    summarize(Avg = mean(ObamaAdv, na.rm=T))
-
-  # PID and dogs
-  group_by(df, PID3) %>%
-    summarize(Dogs = mean(PetDog, na.rm = T))
-
-
-# Multiple reg
-# ----------------------
-  
-  # sparse controls
-  m2 = lm(ObamaAdv ~ PetDog + PID3 + IdeologyLR + NationalEconomy + FamilyFinance, data = df)
-  
-  # fuller control 
-  m3 = lm(ObamaAdv ~ PetDog + PetHorse + 
-            Age + Income, data = df)
-  
-  # stargazer output
-  stargazer(m2, m3, type = 'text', keep.stat = 'n')
+  stargazer(e1, e2, e3, type = 'text', keep.stat = 'n')
   
